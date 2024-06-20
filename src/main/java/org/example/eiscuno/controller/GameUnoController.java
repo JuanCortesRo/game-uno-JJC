@@ -1,3 +1,4 @@
+
 package org.example.eiscuno.controller;
 
 import javafx.event.ActionEvent;
@@ -33,7 +34,6 @@ public class GameUnoController {
     private Table table;
     private GameUno gameUno;
     private int posInitCardToShow;
-
     private ThreadSingUNOMachine threadSingUNOMachine;
     private ThreadPlayMachine threadPlayMachine;
 
@@ -79,11 +79,18 @@ public class GameUnoController {
 
             cardImageView.setOnMouseClicked((MouseEvent event) -> {
                 // Aqui deberian verificar si pueden en la tabla jugar esa carta
-                gameUno.playCard(card);
-                tableImageView.setImage(card.getImage());
-                humanPlayer.removeCard(findPosCardsHumanPlayer(card));
-                threadPlayMachine.setHasPlayerPlayed(true);
-                printCardsHumanPlayer();
+                if (threadPlayMachine.getCurrentCard() == null || threadPlayMachine.getCurrentCard().isCompatible(card)) {
+                    gameUno.playCard(card);
+                    tableImageView.setImage(card.getImage());
+                    humanPlayer.removeCard(findPosCardsHumanPlayer(card));
+                    threadPlayMachine.setHasPlayerPlayed(true);
+                    threadPlayMachine.setCurrentCard(card);
+                    card.printColor();
+                    printCardsHumanPlayer();
+                } else {
+                    // Mostrar un mensaje o hacer algo si la carta no es compatible
+                    System.out.println("No puedes jugar esta carta.");
+                }
             });
 
             this.gridPaneCardsPlayer.add(cardImageView, i, 0);
