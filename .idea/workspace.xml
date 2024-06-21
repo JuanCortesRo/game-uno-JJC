@@ -78,7 +78,7 @@
       <module name="eisc-uno" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.example.eiscuno.*" />
+          <option name="PATTERN" value="org.example.eiscuno.observer.Observer" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -120,7 +120,7 @@
       <workItem from="1717704199858" duration="6785000" />
       <workItem from="1717852871006" duration="31000" />
       <workItem from="1717853787588" duration="7091000" />
-      <workItem from="1718850636323" duration="19495000" />
+      <workItem from="1718850636323" duration="28745000" />
     </task>
     <servers />
   </component>
