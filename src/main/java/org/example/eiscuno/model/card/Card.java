@@ -1,3 +1,5 @@
+
+
 package org.example.eiscuno.model.card;
 
 import javafx.scene.image.Image;
@@ -18,8 +20,11 @@ public class Card {
      *
      * @param url the URL of the card image
      * @param value of the card
+     * @param color of the card
+     * @param image the image of the card
+     * @param cardImageView the ImageView of the card
      */
-    public Card(String url, String value, String color) {
+    public Card(String url, String value, String color,Image image, ImageView cardImageView) {
         this.url = url;
         this.value = value;
         this.color = color;

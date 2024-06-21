@@ -6,17 +6,22 @@ import org.example.eiscuno.model.card.Card;
 import java.util.Collections;
 import java.util.Stack;
 
+import org.example.eiscuno.model.card.CardFactory;
+import org.example.eiscuno.model.card.StandardCardFactory;
+
 /**
  * Represents a deck of Uno cards.
  */
 public class Deck {
     private Stack<Card> deckOfCards;
+    private CardFactory cardFactory;
 
     /**
      * Constructs a new deck of Uno cards and initializes it.
      */
     public Deck() {
         deckOfCards = new Stack<>();
+        cardFactory = new StandardCardFactory();
         initializeDeck();
     }
 
@@ -34,7 +39,11 @@ public class Deck {
                     cardEnum.name().startsWith("TWO_WILD_DRAW_") ||
                     cardEnum.name().equals("FOUR_WILD_DRAW") ||
                     cardEnum.name().equals("WILD")) {
-                Card card = new Card(cardEnum.getFilePath(), getCardValue(cardEnum.name()), getCardColor(cardEnum.name()));
+                Card card = cardFactory.createCard(
+                        cardEnum.getFilePath(),
+                        getCardValue(cardEnum.name()),
+                        getCardColor(cardEnum.name())
+                );
                 deckOfCards.push(card);
             }
         }
