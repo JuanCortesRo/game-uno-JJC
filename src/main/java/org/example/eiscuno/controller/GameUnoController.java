@@ -75,7 +75,7 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
 
-        threadPlayMachine = new ThreadPlayMachine(this.table, this.machinePlayer, this.tableImageView, this.gamePane, this.colorCircle, this);
+        threadPlayMachine = new ThreadPlayMachine(this.deck, this.table, this.machinePlayer, this.tableImageView, this.gamePane, this.colorCircle, this);
         threadPlayMachine.start();
 
         cardsButton.setOnMouseEntered(event -> nodeZoom(true,cardsButton,1.1));
@@ -193,6 +193,7 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         Platform.runLater(this::printCardsMachine);
         nodeZoom(false,tableImageView, 1.2);
         setupGridPane();
+        cardsButton.setDisable(false);
         System.out.println("- - - - - TURNO JUGADOR - - - - -");
     }
 
@@ -445,7 +446,11 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
      */
     @FXML
     void onHandleTakeCard(ActionEvent event) {
-        // Implement logic to take a card here
+        System.out.println("El jugador come una carta");
+        this.humanPlayer.addCard(this.deck.takeCard());
+        printCardsHumanPlayer();
+        cardsButton.setDisable(true);
+        threadPlayMachine.setHasPlayerPlayed(true);
     }
 
     /**

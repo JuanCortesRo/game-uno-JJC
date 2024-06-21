@@ -14,6 +14,8 @@ import javafx.util.Duration;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
+import org.example.eiscuno.model.deck.Deck;
+import org.example.eiscuno.controller.GameUnoController;
 
 import javax.net.ssl.SSLContext;
 import java.util.Objects;
@@ -23,6 +25,7 @@ import static org.example.eiscuno.model.unoenum.EISCUnoEnum.CARD_UNO;
 
 public class ThreadPlayMachine extends Thread {
     private Table table;
+    private Deck deck;
     private Player machinePlayer;
     private ImageView tableImageView;
     private Pane gamePane;
@@ -31,7 +34,7 @@ public class ThreadPlayMachine extends Thread {
     private volatile Card currentCard;
     private MachinePlayCallback callback;
 
-    public ThreadPlayMachine(Table table, Player machinePlayer, ImageView tableImageView, Pane gamePane, Circle colorCircle, MachinePlayCallback callback) {
+    public ThreadPlayMachine(Deck deck,Table table, Player machinePlayer, ImageView tableImageView, Pane gamePane, Circle colorCircle, MachinePlayCallback callback) {
         this.table = table;
         this.machinePlayer = machinePlayer;
         this.tableImageView = tableImageView;
@@ -40,6 +43,7 @@ public class ThreadPlayMachine extends Thread {
         this.currentCard = null;
         this.callback = callback;
         this.colorCircle = colorCircle;
+        this.deck = deck;
     }
 
     public void run() {
@@ -96,6 +100,7 @@ public class ThreadPlayMachine extends Thread {
                 }
 
                 if (!cardPlayed) {
+                    this.machinePlayer.addCard(this.deck.takeCard());
                     System.out.println("La máquina no puede jugar una carta compatible y necesita tomar una nueva carta.");
                 }
 
