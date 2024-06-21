@@ -75,7 +75,7 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
         t.start();
 
-        threadPlayMachine = new ThreadPlayMachine(this.deck, this.table, this.machinePlayer, this.tableImageView, this.gamePane, this.colorCircle, this);
+        threadPlayMachine = new ThreadPlayMachine(this.deck, this.table, this.humanPlayer, this.machinePlayer, this.tableImageView, this.gamePane, this.colorCircle, this);
         threadPlayMachine.start();
 
         cardsButton.setOnMouseEntered(event -> nodeZoom(true,cardsButton,1.1));
@@ -99,49 +99,64 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
     /**
      * Prints the human player's cards on the grid pane.
      */
-    private void printCardsHumanPlayer() {
-        this.gridPaneCardsPlayer.getChildren().clear();
-        Card[] currentVisibleCardsHumanPlayer = this.gameUno.getCurrentVisibleCardsHumanPlayer(this.posInitCardToShow);
+    @Override
+    public void printCardsHumanPlayer() {
+        Platform.runLater(() -> {
+            try {
+                gridPaneCardsPlayer.getChildren().clear();
+                Card[] currentVisibleCardsHumanPlayer = this.gameUno.getCurrentVisibleCardsHumanPlayer(this.posInitCardToShow);
 
-        for (int i = 0; i < currentVisibleCardsHumanPlayer.length; i++) {
-            Card card = currentVisibleCardsHumanPlayer[i];
-            ImageView cardImageView = card.getCard();
+                for (int i = 0; i < currentVisibleCardsHumanPlayer.length; i++) {
+                    Card card = currentVisibleCardsHumanPlayer[i];
+                    ImageView cardImageView = card.getCard();
 
-            cardImageView.setOnMouseEntered(event -> nodeZoom(true,cardImageView,1.2));
-            cardImageView.setOnMouseExited(event -> nodeZoom(false,cardImageView,1.2));
+                    cardImageView.setOnMouseEntered(event -> nodeZoom(true, cardImageView, 1.2));
+                    cardImageView.setOnMouseExited(event -> nodeZoom(false, cardImageView, 1.2));
 
-            cardImageView.setOnMouseClicked((MouseEvent event) -> {
-                // Aqui deberian verificar si pueden en la tabla jugar esa carta
-                if (Objects.equals(card.getValue(), "EAT4")) {
-                    addChangeColorButtons(card);
-                    System.out.println("EN ESTE MOMENTO EL ENEMIGO DEBERÍA DE COMER 4");
-                } else if (Objects.equals(card.getValue(), "NEWCOLOR")) {
-                    addChangeColorButtons(card);
-                    System.out.println("EN ESTE MOMENTO DEBERÍA CAMBIAR DE COLOR");
-                } else if (card.getValue() != null && card.getColor() != null) {
-                    if (threadPlayMachine.getCurrentCard() == null || threadPlayMachine.getCurrentCard().isCompatible(card)) {
-                        if (Objects.equals(card.getValue(), "EAT2")) {
-                            playWithThe(card);
-                            System.out.println("EN ESTE MOMENTO EL ENEMIGO DEBERÍA DE COMER 2");
-                        } else if (Objects.equals(card.getValue(), "REVERSE")) {
-                            playWithThe(card);
-                            System.out.println("EN EL JUEGO CAMBIA DE SENTIDO");
-                        } else if (Objects.equals(card.getValue(), "SKIP")) {
-                            playWithThe(card);
-                            System.out.println("EN ESTE MOMENTO EL ENEMIGO PIERDE TURNO");
-                        } else {
-                            playWithThe(card);
-                            System.out.println("NORMAL");
+                    cardImageView.setOnMouseClicked((MouseEvent event) -> {
+                        if (Objects.equals(card.getValue(), "EAT4")) {
+                            for (int j = 0; j < 4; j++) {
+                                machinePlayer.addCard(this.deck.takeCard());
+                            }
+                            addChangeColorButtons(card, false);
+                            System.out.println("LA MAQUINA COME 4");
+                            machinePlayer.addCard(this.deck.takeCard());
+                        } else if (Objects.equals(card.getValue(), "NEWCOLOR")) {
+                            addChangeColorButtons(card, true);
+                            System.out.println("EN ESTE MOMENTO DEBERÍA CAMBIAR DE COLOR");
+                        } else if (card.getValue() != null && card.getColor() != null) {
+                            if (threadPlayMachine.getCurrentCard() == null || threadPlayMachine.getCurrentCard().isCompatible(card)) {
+                                if (Objects.equals(card.getValue(), "EAT2")) {
+                                    for (int j = 0; j < 2; j++) {
+                                        machinePlayer.addCard(this.deck.takeCard());
+                                    }
+                                    playWithThe(card, false);
+                                    System.out.println("LA MAQUINA COME 2");
+                                } else if (Objects.equals(card.getValue(), "REVERSE")) {
+                                    playWithThe(card, true);
+                                    System.out.println("EN EL JUEGO CAMBIA DE SENTIDO");
+                                } else if (Objects.equals(card.getValue(), "SKIP")) {
+                                    playWithThe(card, false);
+                                    System.out.println("LA MAQUINA PIERDE TURNO");
+                                } else {
+                                    playWithThe(card, true);
+                                    System.out.println("CARTA NORMAL");
+                                }
+                            } else {
+                                System.out.println("No puedes jugar esta carta.");
+                            }
                         }
-                    } else {
-                        System.out.println("No puedes jugar esta carta.");
-                    }
+                    });
+                    playerCardImageViews.add(cardImageView);
+                    this.gridPaneCardsPlayer.add(cardImageView, i, 0);
                 }
-            });
-            playerCardImageViews.add(cardImageView);
-            this.gridPaneCardsPlayer.add(cardImageView, i, 0);
-        }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Error actualizando cartas del jugador: " + e.getMessage());
+            }
+        });
     }
+
 
     /**
      * Disable all player card images.
@@ -152,6 +167,8 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
             nodeZoom(true,imageView,0.95);
             applyLowContrastEffect(imageView);
         }
+        cardsButton.setDisable(true);
+        applyLowContrastEffect(cardsButton);
     }
 
     /**
@@ -159,11 +176,17 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
      */
     @Override
     public void enablePlayerCards() {
-        for (ImageView imageView : playerCardImageViews) {
-            imageView.setDisable(false);
-            nodeZoom(true,imageView,1);
-            clearEffects(imageView);
-        }
+        Platform.runLater(() -> {
+            synchronized (playerCardImageViews) {
+                for (ImageView imageView : playerCardImageViews) {
+                    imageView.setDisable(false);
+                    nodeZoom(true, imageView, 1);
+                    clearEffects(imageView);
+                }
+            }
+            cardsButton.setDisable(false);
+            clearEffects(cardsButton);
+        });
     }
 
     /**
@@ -188,6 +211,9 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         node.setEffect(null);
     }
 
+    /**
+     * Callback method invoked when the machine (computer player) has completed its turn.
+     */
     @Override
     public void onMachinePlayed() {
         Platform.runLater(this::printCardsMachine);
@@ -197,18 +223,29 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         System.out.println("- - - - - TURNO JUGADOR - - - - -");
     }
 
-    private void playWithThe(Card card) {
+    /**
+     * Plays a card in the game Uno, updating various game elements and triggering actions accordingly.
+     *
+     * @param card The card to be played in the game.
+     * @param hasPlayerPlayed Indicates whether the player has already played their turn.
+     *                       If true, disables player cards and triggers animations.
+     */
+    private void playWithThe(Card card, boolean hasPlayerPlayed) {
         gameUno.playCard(card);
         tableImageView.setImage(card.getImage());
-        nodeZoom(false,tableImageView, 1.2);
+        nodeZoom(false, tableImageView, 1.2);
         humanPlayer.removeCard(findPosCardsHumanPlayer(card));
-        threadPlayMachine.setHasPlayerPlayed(true);
+        threadPlayMachine.setHasPlayerPlayed(hasPlayerPlayed);
+        card.printColor();
+        setupGridPane();
+        printCardsMachine();
+        printCardsHumanPlayer();
         threadPlayMachine.setCurrentCard(card);
         threadPlayMachine.changeBackgroundColor(card);
-        card.printColor();
-        printCardsHumanPlayer();
-        disablePlayerCards();
-        playWaveTranslateAnimation(gridPaneCardsMachine, Duration.seconds(0.5),20);
+        if (hasPlayerPlayed){
+            disablePlayerCards();
+            playWaveTranslateAnimation(gridPaneCardsMachine, Duration.seconds(0.5), 20);
+        }
     }
 
     private void setButtonProps(Button button, int layoutX, int layoutY, String color, int rotation){
@@ -218,7 +255,15 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         button.setStyle("-fx-background-radius: 5 5 60 5; -fx-background-color: "+color+";-fx-rotate: "+rotation);
     }
 
-    private void addChangeColorButtons(Card card) {
+    /**
+     * Adds color change buttons to the interface when a special Uno card (like Wild or Wild Draw Four) is played,
+     * allowing the player to select a new color for the card.
+     *
+     * @param card The Uno card that triggered the color change option.
+     * @param hasPlayerPlayed Indicates whether the player has already played their turn.
+     *                       If true, certain UI elements and actions are disabled temporarily.
+     */
+    private void addChangeColorButtons(Card card, boolean hasPlayerPlayed) {
         disablePlayerCards();
         Button redButton = new Button();
         Button blueButton = new Button();
@@ -232,33 +277,39 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
 
         redButton.setOnMouseClicked(event -> {
             card.setColor("RED");
-            playWithThe(card);
+            playWithThe(card,hasPlayerPlayed);
             colorButtonsAnimations(false,redButton,blueButton,yellowButton,greenButton);
+            enablePlayerCards();
         });
 
         yellowButton.setOnMouseClicked(event -> {
             card.setColor("YELLOW");
-            playWithThe(card);
+            playWithThe(card,hasPlayerPlayed);
             colorButtonsAnimations(false,redButton,blueButton,yellowButton,greenButton);
-
+            enablePlayerCards();
         });
 
         greenButton.setOnMouseClicked(event -> {
             card.setColor("GREEN");
-            playWithThe(card);
+            playWithThe(card,hasPlayerPlayed);
             colorButtonsAnimations(false,redButton,blueButton,yellowButton,greenButton);
+            enablePlayerCards();
         });
 
         blueButton.setOnMouseClicked(event -> {
             card.setColor("BLUE");
-            playWithThe(card);
+            playWithThe(card,hasPlayerPlayed);
             colorButtonsAnimations(false,redButton,blueButton,yellowButton,greenButton);
+            enablePlayerCards();
         });
 
         // Add buttons to the centerPane
         centerPane.getChildren().addAll(redButton, yellowButton, greenButton, blueButton);
     }
 
+    /**
+     * Update and display the machine player's cards in the corresponding grid pane.
+     */
     private void printCardsMachine() {
         this.gridPaneCardsMachine.getChildren().clear();
         Card[] currentVisibleCardsMachinePlayer = this.machinePlayer.getCardsPlayer().toArray(new Card[0]);
@@ -266,8 +317,8 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
 
         for (int i = 0; i < currentVisibleCardsMachinePlayer.length; i++) {
             Card card = currentVisibleCardsMachinePlayer[i];
-            //ImageView machineCardImageView = card.getCard();
-            ImageView machineCardImageView = new ImageView(new Image(String.valueOf(getClass().getResource(CARD_UNO.getFilePath()))));
+            ImageView machineCardImageView = card.getCard();
+            //ImageView machineCardImageView = new ImageView(new Image(String.valueOf(getClass().getResource(CARD_UNO.getFilePath()))));
             machineCardImageView.setTranslateX(-(currentVisibleCardsMachinePlayer.length/0.75));
 
             machineCardImageView.setFitHeight(110);
@@ -280,6 +331,10 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         }
     }
 
+    /**
+     * Configure the grid pane that displays the machine player's cards.
+     * Adjusts the width of the grid pane and the width of each column to accommodate the current number of cards.
+     */
     private void setupGridPane() {
         int numColumns = machinePlayer.getCardsPlayer().size();
         double gridPaneWidth = 353;
@@ -302,6 +357,10 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
 
     /**
      * Controls the zoom animation of a node
+     *
+     * @param doZoom  Specifies whether to zoom in (`true`) or out (`false`).
+     * @param node    The JavaFX node to apply the zoom animation to.
+     * @param to      The target scale value for zooming (`1.0` represents the node's original size).
      */
     private void nodeZoom(boolean doZoom, Node node,double to){
         ScaleTransition translateIn = new ScaleTransition(Duration.seconds(0.2), node);
@@ -356,6 +415,10 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
 
     /**
      * Controls the animation of the machineGridPane when it's the Machine turn
+     *
+     * @param gridPane    The JavaFX GridPane containing nodes to animate.
+     * @param duration    The total duration of the translation animation.
+     * @param translateY  The amount to translate nodes vertically.
      */
     public static void playWaveTranslateAnimation(GridPane gridPane, Duration duration, double translateY) {
         ParallelTransition parallelTransition = new ParallelTransition();
@@ -376,6 +439,14 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         parallelTransition.play();
     }
 
+    /**
+     * Creates a sequential transition that moves a node vertically with an overlap effect.
+     *
+     * @param node       The JavaFX node to animate.
+     * @param duration   The total duration of the translation animation.
+     * @param translateY The amount to translate the node vertically.
+     * @return A SequentialTransition object that combines two TranslateTransition animations to create an overlap effect.
+     */
     private static SequentialTransition createTranslateTransitionWithOverlap(Node node, Duration duration, double translateY) {
         TranslateTransition translateDown = new TranslateTransition(duration.divide(2), node);
         translateDown.setByY(translateY);
@@ -389,6 +460,14 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         return translateWithOverlap;
     }
 
+    /**
+     * Retrieves the node at the specified column and row from a GridPane.
+     *
+     * @param gridPane The GridPane from which to retrieve the node.
+     * @param col      The column index of the node to retrieve.
+     * @param row      The row index of the node to retrieve.
+     * @return The Node at the specified column and row in the GridPane, or null if no such node exists.
+     */
     private static Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
         for (Node node : gridPane.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
@@ -449,8 +528,9 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         System.out.println("El jugador come una carta");
         this.humanPlayer.addCard(this.deck.takeCard());
         printCardsHumanPlayer();
-        cardsButton.setDisable(true);
+        disablePlayerCards();
         threadPlayMachine.setHasPlayerPlayed(true);
+        playWaveTranslateAnimation(gridPaneCardsMachine, Duration.seconds(0.5),20);
     }
 
     /**
