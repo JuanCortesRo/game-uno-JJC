@@ -4,20 +4,18 @@ import org.example.eiscuno.model.card.Card;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
 /**
  * Represents the table in the Uno game where cards are played.
  */
-public class Table extends Observable {
-
+public class Table {
     private ArrayList<Card> cardsTable;
 
     /**
      * Constructs a new Table object with no cards on it.
      */
     public Table(){
-        this.cardsTable = new ArrayList<>();
+        this.cardsTable = new ArrayList<Card>();
     }
 
     /**
@@ -27,8 +25,6 @@ public class Table extends Observable {
      */
     public void addCardOnTheTable(Card card){
         this.cardsTable.add(card);
-        setChanged();  // Marcar el estado como cambiado
-        notifyObservers(card);  // Notificar a los observadores que se agregó una carta
     }
 
     /**
@@ -42,5 +38,22 @@ public class Table extends Observable {
             throw new IndexOutOfBoundsException("There are no cards on the table.");
         }
         return this.cardsTable.get(this.cardsTable.size()-1);
+    }
+
+    public List<Card> clearTable() {
+        List<Card> cardsOnTable = new ArrayList<>(this.cardsTable);
+
+        if (!cardsOnTable.isEmpty()) {
+
+            Card lastCard = cardsOnTable.remove(cardsOnTable.size() - 1);
+            this.cardsTable.clear();
+            this.cardsTable.add(lastCard);
+
+            System.out.println("Mesa limpia. Última carta: " + lastCard.getValue()+ " "+lastCard.getColor());
+        } else {
+            System.out.println("La mesa ya está vacía.");
+        }
+
+        return cardsOnTable;
     }
 }
