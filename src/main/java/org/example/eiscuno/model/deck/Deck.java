@@ -50,6 +50,19 @@ public class Deck {
         Collections.shuffle(deckOfCards);
     }
 
+    /**
+     * Returns the corresponding card value, or null if no match is found.
+     *
+     * @param name The name string of the card.
+     * @return The card value associated with the ending of the name string, or null if no match is found.
+     *         Possible return values:
+     *         - "0" to "9" for number cards.
+     *         - "EAT2" for "TWO_WILD_DRAW" (Eat 2 cards).
+     *         - "NEWCOLOR" for "WILD" (Change color cards).
+     *         - "REVERSE" for "RESERVE" (Reverse cards).
+     *         - "SKIP" for "SKIP" (Skip cards).
+     *         - "EAT4" for "FOUR_WILD_DRAW" (Eat 4 cards).
+     */
     private String getCardValue(String name) {
         if (name.endsWith("0")){
             return "0";
@@ -87,6 +100,18 @@ public class Deck {
 
     }
 
+    /**
+     * Returns the corresponding color for specific starting substrings, or null if no match is found.
+     *
+     * @param name The name string of the card.
+     * @return The card color associated with the starting substring of the name string, or null if no match is found.
+     *         Possible return values:
+     *         - "GREEN"
+     *         - "YELLOW"
+     *         - "BLUE"
+     *         - "RED"
+     *         - null if the name does not start with any recognized color.
+     */
     private String getCardColor(String name){
         if(name.startsWith("GREEN")){
             return "GREEN";

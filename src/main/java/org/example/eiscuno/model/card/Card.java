@@ -63,14 +63,30 @@ public class Card {
         return image;
     }
 
+    /**
+     * Returns the value of the card.
+     *
+     * @return The value of the card as a string.
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Returns the color of the card.
+     *
+     * @return The color of the card as a string.
+     */
     public String getColor() {
         return color;
     }
 
+    /**
+     * Checks if this card is compatible with another card.
+     *
+     * @param other The other card to compare compatibility with.
+     * @return true if the cards are compatible, false otherwise.
+     */
     public boolean isCompatible(Card other) {
         if (this.color != null && this.value != null) {
             if (this.color.equals(other.getColor()) || this.value.equals(other.getValue())) {
@@ -80,10 +96,18 @@ public class Card {
         return false;
     }
 
+    /**
+     * Sets the color of the card to the specified new color.
+     *
+     * @param newColor The new color to set for the card.
+     */
     public void setColor(String newColor){
         this.color = newColor;
     }
 
+    /**
+     * Prints the color and value of the card to the console.
+     */
     public void printColor(){
         System.out.println(getColor()+getValue());
     }
