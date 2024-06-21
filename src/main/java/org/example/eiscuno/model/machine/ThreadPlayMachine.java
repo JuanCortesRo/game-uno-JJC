@@ -14,6 +14,7 @@ import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.player.Player;
+import org.example.eiscuno.model.game.GameUno;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.deck.Deck;
 import org.example.eiscuno.controller.GameUnoController;
@@ -31,12 +32,13 @@ public class ThreadPlayMachine extends Thread {
     private Player humanPlayer;
     private ImageView tableImageView;
     private Pane gamePane;
+    private GameUno gameUno;
     private Circle colorCircle;
     private volatile boolean hasPlayerPlayed;
     private volatile Card currentCard;
     private MachinePlayCallback callback;
 
-    public ThreadPlayMachine(Deck deck,Table table, Player humanPlayer, Player machinePlayer, ImageView tableImageView, Pane gamePane, Circle colorCircle, MachinePlayCallback callback) {
+    public ThreadPlayMachine(Deck deck,Table table, Player humanPlayer, Player machinePlayer, ImageView tableImageView, Pane gamePane, GameUno gameUno, Circle colorCircle, MachinePlayCallback callback) {
         this.table = table;
         this.machinePlayer = machinePlayer;
         this.humanPlayer = humanPlayer;
@@ -45,6 +47,7 @@ public class ThreadPlayMachine extends Thread {
         this.hasPlayerPlayed = false;
         this.currentCard = null;
         this.callback = callback;
+        this.gameUno = gameUno;
         this.colorCircle = colorCircle;
         this.deck = deck;
     }
@@ -65,51 +68,55 @@ public class ThreadPlayMachine extends Thread {
 
                     if (this.currentCard == null && card.getColor() != null) {
                         playTheEnemy(card, i);
-                        System.out.println("NO HABIA NINGUNA CARTA, LA MAQUINA JUGÓ PRIMERO");
+                        System.out.println("- No habia ninguna carta inicialmente, la maquina comienza el juego");
                         cardPlayed = true;
                         break;
                     } else if (Objects.equals(card.getValue(), "EAT4")) {
-                        for (int j = 0; j < 4; j++) {
-                            this.humanPlayer.addCard(this.deck.takeCard());
-                        }
+                        gameUno.eatCard(humanPlayer,4);
+                        playTheEnemy(card, i);
                         Platform.runLater(() -> {
                             callback.printCardsHumanPlayer();
                         });
-                        System.out.println("EL ENEMIGO HACE COMER 4 AL JUGADOR");
+                        System.out.println("- El jugador come 4 cartas y pierde turno, la maquina vuelve a tirar");
                         String newColor = chooseRandomColor();
                         card.setColor(newColor);
-                        System.out.println("LA MAQUINA CAMBIÓ DE COLOR A " + newColor);
-                        playTheEnemy(card, i);
-                        cardPlayed = true;
-                        break;
+                        System.out.println("- El color actual ha cambiado, el nuevo color es " + newColor);
+                        cardPlayed = false;
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     } else if (Objects.equals(card.getValue(), "NEWCOLOR")) {
                         String newColor = chooseRandomColor();
                         card.setColor(newColor);
-                        System.out.println("LA MAQUINA CAMBIÓ DE COLOR A " + newColor);
+                        System.out.println("- El color actual ha cambiado, el nuevo color es " + newColor);
                         playTheEnemy(card, i);
                         cardPlayed = true;
                         break;
                     } else if ((currentCard.getValue() != null && currentCard.getColor() != null)) {
                         if (currentCard.isCompatible(card)) {
                             if (Objects.equals(card.getValue(), "EAT2")) {
-                                for (int j = 0; j < 2; j++) {
-                                    this.humanPlayer.addCard(this.deck.takeCard());
-                                }
+                                gameUno.eatCard(humanPlayer,2);
                                 Platform.runLater(() -> {
                                     callback.printCardsHumanPlayer();
                                 });
                                 playTheEnemy(card, i);
-                                System.out.println("EL ENEMIGO HACE COMER 2 CARTAS AL JUGADOR");
-                                cardPlayed = true;
-                                break;
+                                System.out.println("- El jugador come 2 cartas y pierde turno, la maquina vuelve a tirar");
+                                cardPlayed = false;
+                                try {
+                                    Thread.sleep(2000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                             } else if (Objects.equals(card.getValue(), "REVERSE")) {
                                 playTheEnemy(card, i);
-                                System.out.println("EN EL JUEGO CAMBIA DE SENTIDO");
+                                System.out.println("- El juego cambia de sentido");
                                 cardPlayed = true;
                                 break;
                             } else if (Objects.equals(card.getValue(), "SKIP")) {
                                 playTheEnemy(card, i);
-                                System.out.println("EL ENEMIGO HACE PERDER TURNO AL JUGADOR");
+                                System.out.println("- El enemigo hace que el jugador pierda turno, volverá a tirar");
                                 cardPlayed = false;
                                 try {
                                     Thread.sleep(2000);
@@ -118,7 +125,7 @@ public class ThreadPlayMachine extends Thread {
                                 }
                             } else {
                                 playTheEnemy(card, i);
-                                System.out.println("NORMAL");
+                                System.out.println("- Se tiró una carta común, nada pasa");
                                 cardPlayed = true;
                                 break;
                             }
@@ -127,7 +134,7 @@ public class ThreadPlayMachine extends Thread {
                 }
 
                 if (!cardPlayed) {
-                    System.out.println("La máquina no pudo jugar ninguna carta y tomará una del montón");
+                    System.out.println("La máquina no pudo jugar ninguna carta y comerá una carta de la baraja");
                     this.machinePlayer.addCard(this.deck.takeCard());
                 }
 
@@ -146,17 +153,17 @@ public class ThreadPlayMachine extends Thread {
 
 
     private void playTheEnemy(Card card, int i){
-        table.addCardOnTheTable(card);
+        gameUno.playCard(card);
         tableImageView.setImage(card.getImage());
         machinePlayer.removeCard(i);
         currentCard = card;
         changeBackgroundColor(currentCard);
         currentCard.printColor();
-        putCardOnTheTable(card);
+        tableImageView.setImage(card.getImage());
     }
 
     private String chooseRandomColor() {
-        String[] colors = {"RED", "GREEN", "BLUE", "YELLOW"}; // Ejemplo de colores disponibles
+        String[] colors = {"RED", "GREEN", "BLUE", "YELLOW"};
         Random random = new Random();
         int index = random.nextInt(colors.length);
         return colors[index];
@@ -222,20 +229,12 @@ public class ThreadPlayMachine extends Thread {
         });
     }
 
-
-
-
-    private void putCardOnTheTable(Card card){
-        table.addCardOnTheTable(card);
-        tableImageView.setImage(card.getImage());
-    }
-
     public void setHasPlayerPlayed(boolean hasPlayerPlayed) {
         this.hasPlayerPlayed = hasPlayerPlayed;
     }
 
-    public void setCurrentCard(Card currentCard) {
-        this.currentCard = currentCard;
+    public void setCurrentCard() {
+        this.currentCard = table.getCurrentCardOnTheTable();
     }
 
     public Card getCurrentCard() {

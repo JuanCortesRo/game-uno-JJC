@@ -109,6 +109,6 @@ public class Card {
      * Prints the color and value of the card to the console.
      */
     public void printColor(){
-        System.out.println(getColor()+getValue());
+        System.out.println("Carta actual:"+getColor()+getValue());
     }
 }
