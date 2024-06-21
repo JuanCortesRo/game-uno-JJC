@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="710eeca4-ae2f-4b69-a8cb-8ed69819a00c" name="Changes" comment="">
+    <list default="true" id="710eeca4-ae2f-4b69-a8cb-8ed69819a00c" name="Changes" comment="gig">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +42,7 @@
   "keyToString": {
     "Application.Main.executor": "Run",
     "JUnit.GameUnoTest.executor": "Run",
+    "JUnit.TableTest.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
@@ -66,10 +66,11 @@
       <recent name="" />
     </key>
     <key name="CreateTestDialog.RecentsKey">
+      <recent name="org.example.eiscuno.model.table" />
       <recent name="org.example.eiscuno.model.game" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.GameUnoTest">
+  <component name="RunManager" selected="JUnit.TableTest">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.Main" />
       <module name="game-uno-JJC" />
@@ -98,10 +99,26 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="TableTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="game-uno-JJC" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.eiscuno.model.table.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.example.eiscuno.model.table" />
+      <option name="MAIN_CLASS_NAME" value="org.example.eiscuno.model.table.TableTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.GameUnoTest" />
+        <item itemvalue="JUnit.TableTest" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.GameUnoTest" />
       </list>
     </recent_temporary>
   </component>
@@ -120,7 +137,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1718918490826</updated>
-      <workItem from="1718918491887" duration="4130000" />
+      <workItem from="1718918491887" duration="6835000" />
     </task>
     <servers />
   </component>
