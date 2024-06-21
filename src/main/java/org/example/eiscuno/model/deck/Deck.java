@@ -50,6 +50,7 @@ public class Deck {
         Collections.shuffle(deckOfCards);
     }
 
+
     /**
      * Returns the corresponding card value, or null if no match is found.
      *
@@ -146,5 +147,9 @@ public class Deck {
      */
     public boolean isEmpty() {
         return deckOfCards.isEmpty();
+    }
+
+    public void push(Card card) {
+        this.deckOfCards.push(card);  // Este método push pertenece a Stack<Card>
     }
 }

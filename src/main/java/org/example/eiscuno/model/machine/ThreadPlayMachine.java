@@ -73,13 +73,13 @@ public class ThreadPlayMachine extends Thread {
                         break;
                     } else if (Objects.equals(card.getValue(), "EAT4")) {
                         gameUno.eatCard(humanPlayer,4);
-                        playTheEnemy(card, i);
                         Platform.runLater(() -> {
                             callback.printCardsHumanPlayer();
                         });
                         System.out.println("- El jugador come 4 cartas y pierde turno, la maquina vuelve a tirar");
                         String newColor = chooseRandomColor();
                         card.setColor(newColor);
+                        playTheEnemy(card, i);
                         System.out.println("- El color actual ha cambiado, el nuevo color es " + newColor);
                         cardPlayed = false;
                         try {
@@ -134,8 +134,13 @@ public class ThreadPlayMachine extends Thread {
                 }
 
                 if (!cardPlayed) {
-                    System.out.println("La máquina no pudo jugar ninguna carta y comerá una carta de la baraja");
-                    this.machinePlayer.addCard(this.deck.takeCard());
+                    if (deck.isEmpty()){
+                        callback.restoreDeckIfNeeded();
+                        System.out.println("esta vacia");
+                    } else {
+                        System.out.println("La máquina no pudo jugar ninguna carta y comerá una carta de la baraja");
+                        this.machinePlayer.addCard(this.deck.takeCard());
+                    }
                 }
 
                 Platform.runLater(() -> {
@@ -160,6 +165,7 @@ public class ThreadPlayMachine extends Thread {
         changeBackgroundColor(currentCard);
         currentCard.printColor();
         tableImageView.setImage(card.getImage());
+        callback.checkIfAnyPlayerWins();
     }
 
     private String chooseRandomColor() {
@@ -173,6 +179,8 @@ public class ThreadPlayMachine extends Thread {
         void onMachinePlayed();
         void enablePlayerCards();
         void printCardsHumanPlayer();
+        void restoreDeckIfNeeded();
+        void checkIfAnyPlayerWins();
     }
 
     public void changeBackgroundColor(Card currentCard) {

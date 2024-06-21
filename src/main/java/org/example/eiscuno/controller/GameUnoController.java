@@ -22,9 +22,7 @@ import org.example.eiscuno.model.machine.ThreadSingUNOMachine;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.example.eiscuno.model.unoenum.EISCUnoEnum.CARD_UNO;
 
@@ -237,6 +235,7 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         printCardsHumanPlayer();
         threadPlayMachine.setCurrentCard();
         threadPlayMachine.changeBackgroundColor(card);
+        checkIfAnyPlayerWins();
         if (hasPlayerPlayed){
             disablePlayerCards();
             playWaveTranslateAnimation(gridPaneCardsMachine, Duration.seconds(0.5), 20);
@@ -478,6 +477,43 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         return -1;
     }
 
+    @Override
+    public void checkIfAnyPlayerWins(){
+        if(humanPlayer.getCardsPlayer().size()==4){
+            System.out.println("___________________________________________\n            ¡EL JUGADOR GANÓ! \n___________________________________________");
+        } else if (machinePlayer.getCardsPlayer().size()==0) {
+            System.out.println("___________________________________________\n            ¡LA MAQUINA GANÓ! \n___________________________________________");
+        }
+    }
+
+    @Override
+    public void restoreDeckIfNeeded() {
+        List<Card> cardsOnTable = table.clearTable();
+
+        // Mostrar el mensaje y la última carta de la mesa
+        if (!cardsOnTable.isEmpty()) {
+            Card lastCard = cardsOnTable.get(cardsOnTable.size() - 1);
+            System.out.println("Mesa limpia. Última carta: " + lastCard.getValue() + " " + lastCard.getColor());
+
+            // Crear un nuevo mazo con las cartas de la mesa y barajarlo
+            Stack<Card> newDeckStack = new Stack<>();
+            newDeckStack.addAll(cardsOnTable);
+            Collections.shuffle(newDeckStack);
+
+            // Agregar las cartas restauradas de nuevo al mazo principal
+            while (!newDeckStack.isEmpty()) {
+                deck.push(newDeckStack.pop());
+            }
+
+            // Informar que el mazo se ha restaurado
+            System.out.println("Mazo restaurado con las cartas de la mesa.");
+
+            // Ahora el mazo está listo para ser utilizado
+        } else {
+            System.out.println("La mesa ya está vacía.");
+        }
+    }
+
     /**
      * Handles the "Back" button action to show the previous set of cards.
      *
@@ -511,12 +547,19 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
      */
     @FXML
     void onHandleTakeCard(ActionEvent event) {
-        System.out.println("- El jugador come una carta y pierde turno");
-        this.humanPlayer.addCard(this.deck.takeCard());
-        printCardsHumanPlayer();
-        threadPlayMachine.setHasPlayerPlayed(true);
-        disablePlayerCards();
-        playWaveTranslateAnimation(gridPaneCardsMachine, Duration.seconds(0.5),20);
+        if (deck.isEmpty()) {
+            restoreDeckIfNeeded();
+            System.out.println("esta vacia");
+        }
+        else {
+            System.out.println("- El jugador come una carta y pierde turno");
+            this.humanPlayer.addCard(this.deck.takeCard());
+            printCardsHumanPlayer();
+            threadPlayMachine.setHasPlayerPlayed(true);
+            disablePlayerCards();
+            playWaveTranslateAnimation(gridPaneCardsMachine, Duration.seconds(0.5),20);
+        }
+
     }
 
     /**
