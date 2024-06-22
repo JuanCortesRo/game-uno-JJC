@@ -65,7 +65,9 @@ public enum EISCUnoEnum {
     RED_6("cards-uno/6_red.png"),
     RED_7("cards-uno/7_red.png"),
     RED_8("cards-uno/8_red.png"),
-    RED_9("cards-uno/9_red.png");
+    RED_9("cards-uno/9_red.png"),
+    LOOSE_("images/loose_uno.png"),
+    WIN_("images/win_uno.png");
 
     private final String filePath;
     private static final String PATH = "/org/example/eiscuno/";
