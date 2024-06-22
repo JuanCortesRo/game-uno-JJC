@@ -18,6 +18,7 @@
         <option value="CSS File" />
         <option value="Interface" />
         <option value="Class" />
+        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
@@ -53,6 +54,8 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Equipo/Desktop/Miniproyecto 4 - POE/game-unoII-JJC",
     "list.type.of.created.stylesheet": "CSS",
@@ -70,6 +73,13 @@
       <recent name="C:\Users\fsvc1\Coding\eisc-uno\src\main\resources\org\example\eiscuno" />
       <recent name="C:\Users\fsvc1\Coding\eisc-uno\src\main\resources\org\example\eiscuno\images" />
       <recent name="C:\Users\fsvc1\Coding\eisc-uno\src" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="org.example.eiscuno.model.table" />
+      <recent name="org.example.eiscuno.model.game" />
     </key>
   </component>
   <component name="RunManager">
@@ -120,7 +130,7 @@
       <workItem from="1717704199858" duration="6785000" />
       <workItem from="1717852871006" duration="31000" />
       <workItem from="1717853787588" duration="7091000" />
-      <workItem from="1718850636323" duration="52484000" />
+      <workItem from="1718850636323" duration="53017000" />
     </task>
     <servers />
   </component>
