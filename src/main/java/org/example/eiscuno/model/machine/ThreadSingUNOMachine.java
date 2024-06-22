@@ -35,7 +35,7 @@ public class ThreadSingUNOMachine implements Runnable{
     public void run(){
         while (true){
             try {
-                Thread.sleep(ThreadLocalRandom.current().nextInt(1000, 2000));
+                Thread.sleep(ThreadLocalRandom.current().nextInt(2000, 4000));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -45,24 +45,24 @@ public class ThreadSingUNOMachine implements Runnable{
     }
 
     private void hasOneCardTheHumanPlayer(){
-        if(cardsPlayer.size() == 1 && this.canSingUnoMachine){
+        if(cardsPlayer.size() == 1 && callback.canSingUnoMachineForPlayer){
             System.out.println("LA MAQUINA CANTA UNO AL JUGADOR, EL JUGADOR COME UNA CARTA");
-            this.canSingUnoPlayer = false;
-            this.humanPlayer.addCard(this.deck.takeCard());
+            callback.canSingUnoPlayer = false;
+            humanPlayer.addCard(this.deck.takeCard());
             callback.printCardsHumanPlayer();
         }
-        else if (cardsPlayer.size() != 1 && !canSingUnoMachine){
-            canSingUnoMachine = true;
+        if (cardsPlayer.size() != 1 && !callback.canSingUnoMachineForPlayer){
+            callback.canSingUnoMachineForPlayer = true;
         }
     }
 
-    private void hasOneCardTheMachinePlayer(){
-        if(cardsMachine.size() == 1 && canSingUnoMachine){
+    private void hasOneCardTheMachinePlayer() {
+        if (cardsMachine.size() == 1 && callback.canSingUnoMachineForMachine) {
             System.out.println("LA MAQUINA CANTA UNO PARA SI MISMA");
             callback.canSingUnoPlayer = false;
         }
-        else if (cardsMachine.size() != 1 && !canSingUnoMachine){
-            canSingUnoMachine = true;
+        if (cardsMachine.size() != 1 && !callback.canSingUnoMachineForMachine) {
+            callback.canSingUnoMachineForMachine = true;
         }
     }
 }

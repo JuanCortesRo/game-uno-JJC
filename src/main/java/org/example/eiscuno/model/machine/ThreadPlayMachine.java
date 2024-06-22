@@ -38,6 +38,9 @@ public class ThreadPlayMachine extends Thread {
     private volatile Card currentCard;
     private MachinePlayCallback callback;
 
+    /**
+     * ThreadPlayMachine is a class that handles the automatic game logic for the machine player in a game of Uno.
+     */
     public ThreadPlayMachine(Deck deck,Table table, Player humanPlayer, Player machinePlayer, ImageView tableImageView, Pane gamePane, GameUno gameUno, Circle colorCircle, MachinePlayCallback callback) {
         this.table = table;
         this.machinePlayer = machinePlayer;
@@ -52,6 +55,10 @@ public class ThreadPlayMachine extends Thread {
         this.deck = deck;
     }
 
+    /**
+     * This method contains the main logic for the machine player's turn in the Uno game.
+     * It continuously checks if the human player has played and then proceeds with the machine's turn.
+     */
     public void run() {
         while (true) {
             if (hasPlayerPlayed) {
@@ -77,7 +84,7 @@ public class ThreadPlayMachine extends Thread {
                             callback.printCardsHumanPlayer();
                         });
                         System.out.println("- El jugador come 4 cartas y pierde turno, la maquina vuelve a tirar");
-                        String newColor = chooseRandomColor(currentCard.getColor());
+                        String newColor = chooseRandomColor();
                         card.setColor(newColor);
                         playTheEnemy(card, i);
                         System.out.println("- El color actual ha cambiado, el nuevo color es " + newColor);
@@ -88,7 +95,7 @@ public class ThreadPlayMachine extends Thread {
                             e.printStackTrace();
                         }
                     } else if (Objects.equals(card.getValue(), "NEWCOLOR")) {
-                        String newColor = chooseRandomColor(currentCard.getColor());
+                        String newColor = chooseRandomColor();
                         card.setColor(newColor);
                         System.out.println("- El color actual ha cambiado, el nuevo color es " + newColor);
                         playTheEnemy(card, i);
@@ -134,7 +141,7 @@ public class ThreadPlayMachine extends Thread {
                 }
 
                 if (!cardPlayed) {
-                    if (deck.isEmpty()){
+                    if (this.deck.isEmpty()){
                         callback.restoreDeckIfNeeded();
                         System.out.println("esta vacia");
                     } else {
@@ -156,6 +163,12 @@ public class ThreadPlayMachine extends Thread {
         }
     }
 
+    /**
+     * Plays the specified card for the machine player and updates the game state accordingly.
+     *
+     * @param card The card to be played by the machine player.
+     * @param i The index of the card in the machine player's hand.
+     */
     private void playTheEnemy(Card card, int i){
         callback.checkIfAnyPlayerWins();
         tableImageView.setImage(card.getImage());
@@ -166,18 +179,27 @@ public class ThreadPlayMachine extends Thread {
         currentCard.printColor();
     }
 
-    private String chooseRandomColor(String currentColor) {
+    /**
+     * Chooses a random color from a predefined list, excluding the current color.
+     *
+     * @return A randomly chosen color as a String.
+     */
+    private String chooseRandomColor() {
+        String currentColor = currentCard.getColor();
         String[] colors = {"RED", "GREEN", "BLUE", "YELLOW"};
         Random random = new Random();
         int index = random.nextInt(colors.length);
-        if (colors[index]==currentColor){
-            chooseRandomColor(currentColor);
+        if (colors[index]==currentColor||currentColor==null){
+            chooseRandomColor();
         }else {
             return colors[index];
         }
-        return null;
+        return colors[index];
     }
 
+    /**
+     * Interface defining callbacks for machine gameplay interactions.
+     */
     public interface MachinePlayCallback {
         void onMachinePlayed();
         void enablePlayerCards();
@@ -186,6 +208,11 @@ public class ThreadPlayMachine extends Thread {
         void checkIfAnyPlayerWins();
     }
 
+    /**
+     * Changes the background color of a game pane and a circle element based on the given card color.
+     *
+     * @param cardColor The color string representing the card color to change to.
+     */
     public void changeBackgroundColor(String cardColor) {
         ScaleTransition circleZoom = new ScaleTransition(Duration.seconds(0.4), colorCircle);
         circleZoom.setFromY(0);
@@ -193,11 +220,10 @@ public class ThreadPlayMachine extends Thread {
         circleZoom.setToY(40);
         circleZoom.setToX(40);
 
-        if(currentCard.getColor()==null){
-            cardColor = "BLACK";
-        } else {
-            cardColor = currentCard.getColor();
-        }
+
+
+        cardColor = currentCard.getColor();
+
         switch (cardColor) {
             case "GREEN":
                 colorCircle.setStyle("-fx-fill: #54a954");
@@ -210,9 +236,6 @@ public class ThreadPlayMachine extends Thread {
                 break;
             case "YELLOW":
                 colorCircle.setStyle("-fx-fill: #ffbd39");
-                break;
-            case "BLACK":
-                colorCircle.setStyle("-fx-fill: BLACK");
                 break;
             default:
                 colorCircle.setStyle("-fx-fill: "+cardColor);
@@ -245,14 +268,26 @@ public class ThreadPlayMachine extends Thread {
         });
     }
 
+    /**
+     * Sets the flag indicating whether the player has played.
+     * @param hasPlayerPlayed True if the player has played; false otherwise.
+     */
     public void setHasPlayerPlayed(boolean hasPlayerPlayed) {
         this.hasPlayerPlayed = hasPlayerPlayed;
     }
 
+    /**
+     * Updates the current card to the card currently on the table.
+     * This method retrieves the current card from the table and assigns it to the currentCard variable.
+     */
     public void setCurrentCard() {
         this.currentCard = table.getCurrentCardOnTheTable();
     }
 
+    /**
+     * Retrieves the current card that is on the table.
+     * @return The current card object on the table.
+     */
     public Card getCurrentCard() {
         return currentCard;
     }
