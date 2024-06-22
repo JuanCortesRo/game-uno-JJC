@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
@@ -24,7 +25,7 @@ import org.example.eiscuno.model.table.Table;
 
 import java.util.*;
 
-import static org.example.eiscuno.model.unoenum.EISCUnoEnum.CARD_UNO;
+import static org.example.eiscuno.model.unoenum.EISCUnoEnum.*;
 
 /**
  * Controller class for the Uno game.
@@ -234,7 +235,7 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         printCardsMachine();
         printCardsHumanPlayer();
         threadPlayMachine.setCurrentCard();
-        threadPlayMachine.changeBackgroundColor(card);
+        threadPlayMachine.changeBackgroundColor(card.getColor());
         checkIfAnyPlayerWins();
         if (hasPlayerPlayed){
             disablePlayerCards();
@@ -409,7 +410,6 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         ParallelTransition parallelTransition = new ParallelTransition();
         Duration delayBetweenAnimations = duration.divide(4);  // Ajuste del retraso para crear el solapamiento
 
-        // Primera mitad: de izquierda a derecha
         for (int row = 0; row < gridPane.getRowCount(); row++) {
             for (int col = 0; col < gridPane.getColumnCount(); col++) {
                 Node node = getNodeFromGridPane(gridPane, col, row);
@@ -477,38 +477,81 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         return -1;
     }
 
+
     @Override
     public void checkIfAnyPlayerWins(){
-        if(humanPlayer.getCardsPlayer().size()==4){
-            System.out.println("___________________________________________\n            ¡EL JUGADOR GANÓ! \n___________________________________________");
-        } else if (machinePlayer.getCardsPlayer().size()==0) {
-            System.out.println("___________________________________________\n            ¡LA MAQUINA GANÓ! \n___________________________________________");
-        }
+        Platform.runLater(() -> {
+                    System.out.println(machinePlayer.getCardsPlayer().size());
+                    if(humanPlayer.getCardsPlayer().size()==0){
+                        threadPlayMachine.stop();
+                        System.out.println("___________________________________________\n            ¡EL JUGADOR GANÓ! \n___________________________________________");
+//                        showAlert("¡EL JUGADOR GANÓ!", "¡Felicidades! Has ganado el juego.");
+                        Image winImage = new Image(String.valueOf(getClass().getResource(WIN_.getFilePath())));
+                        ImageView winImageView = new ImageView(winImage);
+                        gamePane.getChildren().add(winImageView);
+                        disablePlayerCards();
+                        disablePlayerCards();
+                    } else if (machinePlayer.getCardsPlayer().size()==0) {
+                        threadPlayMachine.stop();
+                        System.out.println("___________________________________________\n            ¡LA MÁQUINA GANÓ! \n___________________________________________");
+                        Image looseImage = new Image(String.valueOf(getClass().getResource(LOOSE_.getFilePath())));
+                        ImageView looseImageView = new ImageView(looseImage);
+                        gamePane.getChildren().add(looseImageView);
+                        //showAlert("¡LA MÁQUINA GANÓ!", "Lo siento, la máquina ha ganado el juego.");
+                        disablePlayerCards();
+                    }
+                });
     }
+
+    private void showAlert(String title, String content) {
+        Alert alert;
+        alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait().ifPresent(response -> System.exit(0));
+    }
+
+//    @Override
+//    public void checkIfAnyPlayerWins() {
+//        System.out.println(machinePlayer.getCardsPlayer().size());
+//        if (humanPlayer.getCardsPlayer().size() == 0) {
+//            System.out.println("___________________________________________\n            ¡EL JUGADOR GANÓ! \n___________________________________________");
+////            Image winImage = new Image(String.valueOf(getClass().getResource(WIN_.getFilePath())));
+////            ImageView winImageView = new ImageView(winImage);
+////            nodeZoom(true,winImageView,1.5);
+////            gamePane.getChildren().add(winImageView);
+//            disablePlayerCards();
+//            //threadPlayMachine.changeBackgroundColor("LIMEGREEN");
+//        } else if (machinePlayer.getCardsPlayer().size() == 0) {
+//            System.out.println("___________________________________________\n            ¡LA MAQUINA GANÓ! \n___________________________________________");
+////            Image looseImage = new Image(String.valueOf(getClass().getResource(LOOSE_.getFilePath())));
+////            ImageView looseImageView = new ImageView(looseImage);
+////            nodeZoom(true,looseImageView,1.5);
+////            gamePane.getChildren().add(looseImageView);
+//            disablePlayerCards();
+//            //threadPlayMachine.changeBackgroundColor("RED");
+//        }
+//    }
 
     @Override
     public void restoreDeckIfNeeded() {
         List<Card> cardsOnTable = table.clearTable();
 
-        // Mostrar el mensaje y la última carta de la mesa
         if (!cardsOnTable.isEmpty()) {
             Card lastCard = cardsOnTable.get(cardsOnTable.size() - 1);
             System.out.println("Mesa limpia. Última carta: " + lastCard.getValue() + " " + lastCard.getColor());
 
-            // Crear un nuevo mazo con las cartas de la mesa y barajarlo
             Stack<Card> newDeckStack = new Stack<>();
             newDeckStack.addAll(cardsOnTable);
             Collections.shuffle(newDeckStack);
 
-            // Agregar las cartas restauradas de nuevo al mazo principal
             while (!newDeckStack.isEmpty()) {
                 deck.push(newDeckStack.pop());
             }
 
-            // Informar que el mazo se ha restaurado
             System.out.println("Mazo restaurado con las cartas de la mesa.");
 
-            // Ahora el mazo está listo para ser utilizado
         } else {
             System.out.println("La mesa ya está vacía.");
         }

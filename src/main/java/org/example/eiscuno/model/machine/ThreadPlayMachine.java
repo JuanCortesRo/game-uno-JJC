@@ -77,7 +77,7 @@ public class ThreadPlayMachine extends Thread {
                             callback.printCardsHumanPlayer();
                         });
                         System.out.println("- El jugador come 4 cartas y pierde turno, la maquina vuelve a tirar");
-                        String newColor = chooseRandomColor();
+                        String newColor = chooseRandomColor(currentCard.getColor());
                         card.setColor(newColor);
                         playTheEnemy(card, i);
                         System.out.println("- El color actual ha cambiado, el nuevo color es " + newColor);
@@ -88,7 +88,7 @@ public class ThreadPlayMachine extends Thread {
                             e.printStackTrace();
                         }
                     } else if (Objects.equals(card.getValue(), "NEWCOLOR")) {
-                        String newColor = chooseRandomColor();
+                        String newColor = chooseRandomColor(currentCard.getColor());
                         card.setColor(newColor);
                         System.out.println("- El color actual ha cambiado, el nuevo color es " + newColor);
                         playTheEnemy(card, i);
@@ -156,23 +156,26 @@ public class ThreadPlayMachine extends Thread {
         }
     }
 
-
     private void playTheEnemy(Card card, int i){
-        gameUno.playCard(card);
-        tableImageView.setImage(card.getImage());
-        machinePlayer.removeCard(i);
-        currentCard = card;
-        changeBackgroundColor(currentCard);
-        currentCard.printColor();
-        tableImageView.setImage(card.getImage());
         callback.checkIfAnyPlayerWins();
+        tableImageView.setImage(card.getImage());
+        gameUno.playCard(card);
+        currentCard = card;
+        machinePlayer.removeCard(i);
+        changeBackgroundColor(currentCard.getColor());
+        currentCard.printColor();
     }
 
-    private String chooseRandomColor() {
+    private String chooseRandomColor(String currentColor) {
         String[] colors = {"RED", "GREEN", "BLUE", "YELLOW"};
         Random random = new Random();
         int index = random.nextInt(colors.length);
-        return colors[index];
+        if (colors[index]==currentColor){
+            chooseRandomColor(currentColor);
+        }else {
+            return colors[index];
+        }
+        return null;
     }
 
     public interface MachinePlayCallback {
@@ -183,14 +186,13 @@ public class ThreadPlayMachine extends Thread {
         void checkIfAnyPlayerWins();
     }
 
-    public void changeBackgroundColor(Card currentCard) {
+    public void changeBackgroundColor(String cardColor) {
         ScaleTransition circleZoom = new ScaleTransition(Duration.seconds(0.4), colorCircle);
         circleZoom.setFromY(0);
         circleZoom.setFromX(0);
         circleZoom.setToY(40);
         circleZoom.setToX(40);
 
-        String cardColor;
         if(currentCard.getColor()==null){
             cardColor = "BLACK";
         } else {
@@ -212,12 +214,14 @@ public class ThreadPlayMachine extends Thread {
             case "BLACK":
                 colorCircle.setStyle("-fx-fill: BLACK");
                 break;
+            default:
+                colorCircle.setStyle("-fx-fill: "+cardColor);
         }
         circleZoom.play();
 
+        String finalCardColor = cardColor;
         circleZoom.setOnFinished(event -> {
-            //System.out.println("Animation finished. Changing background color.");
-            switch (cardColor) {
+            switch (finalCardColor) {
                 case "GREEN":
                     gamePane.setStyle("-fx-background-color: #54a954");
                     break;
