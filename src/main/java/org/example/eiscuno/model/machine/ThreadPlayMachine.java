@@ -15,7 +15,6 @@ import org.example.eiscuno.model.card.Card;
 import org.example.eiscuno.model.player.Player;
 import org.example.eiscuno.model.table.Table;
 import org.example.eiscuno.model.deck.Deck;
-import org.example.eiscuno.controller.GameUnoController;
 
 import javax.net.ssl.SSLContext;
 import java.util.Objects;

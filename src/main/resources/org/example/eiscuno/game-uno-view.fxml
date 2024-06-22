@@ -47,7 +47,7 @@
          <right>
             <Pane prefHeight="250.0" prefWidth="270.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button alignment="CENTER" disable="true" layoutY="89.0" mnemonicParsing="false" onAction="#onHandleUno" prefHeight="80.0" prefWidth="154.0" style="-fx-background-color: TRANSPARENT;">
+                  <Button fx:id="unoButton" alignment="CENTER" layoutY="89.0" mnemonicParsing="false" onAction="#onHandleUno" prefHeight="80.0" prefWidth="154.0" style="-fx-background-color: TRANSPARENT;">
                      <graphic>
                         <ImageView fitHeight="91.0" fitWidth="227.0" pickOnBounds="true" preserveRatio="true">
                            <image>

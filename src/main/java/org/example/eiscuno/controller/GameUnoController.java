@@ -33,6 +33,8 @@ import static org.example.eiscuno.model.unoenum.EISCUnoEnum.CARD_UNO;
  */
 public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback {
     @FXML
+    public Button unoButton;
+
     private Pane gamePane;
     @FXML
     private Pane centerPane;
@@ -50,7 +52,9 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
     private Circle colorCircle;
 
     private Player humanPlayer;
+    public boolean canSingUnoPlayer;
     private Player machinePlayer;
+    private boolean canSingUnoMachine;
     private Deck deck;
     private Table table;
     private GameUno gameUno;
@@ -71,8 +75,8 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         printCardsMachine();
         setupGridPane();
 
-        threadSingUNOMachine = new ThreadSingUNOMachine(this.humanPlayer.getCardsPlayer());
-        Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNO");
+        threadSingUNOMachine = new ThreadSingUNOMachine(this, this.machinePlayer.getCardsPlayer(), this.humanPlayer, this.deck, this.humanPlayer.getCardsPlayer(), this.unoButton, this.canSingUnoMachine, this.canSingUnoPlayer);
+        Thread t = new Thread(threadSingUNOMachine, "ThreadSingUNOMachine");
         t.start();
 
         threadPlayMachine = new ThreadPlayMachine(this.deck, this.table, this.machinePlayer, this.tableImageView, this.gamePane, this.colorCircle, this);
@@ -94,6 +98,8 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         this.table = new Table();
         this.gameUno = new GameUno(this.humanPlayer, this.machinePlayer, this.deck, this.table);
         this.posInitCardToShow = 0;
+        this.canSingUnoPlayer = true;
+        this.canSingUnoMachine = true;
     }
 
     /**
@@ -194,6 +200,7 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         nodeZoom(false,tableImageView, 1.2);
         setupGridPane();
         cardsButton.setDisable(false);
+        canSingUnoPlayer = true;
         System.out.println("- - - - - TURNO JUGADOR - - - - -");
     }
 
@@ -420,6 +427,7 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
      */
     @FXML
     void onHandleBack(ActionEvent event) {
+        printCardsHumanPlayer();
         if (this.posInitCardToShow > 0) {
             this.posInitCardToShow--;
             printCardsHumanPlayer();
@@ -433,6 +441,7 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
      */
     @FXML
     void onHandleNext(ActionEvent event) {
+        printCardsHumanPlayer();
         if (this.posInitCardToShow < this.humanPlayer.getCardsPlayer().size() - 4) {
             this.posInitCardToShow++;
             printCardsHumanPlayer();
@@ -471,6 +480,16 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
      */
     @FXML
     void onHandleUno(ActionEvent event) {
-        // Implement logic to handle Uno event here
+        if (humanPlayer.getCardsPlayer().size() == 1 && canSingUnoPlayer){
+            System.out.println("PLAYER SAYS UNO");
+            threadSingUNOMachine.canSingUnoMachine = false;
+        }
+
+        if (machinePlayer.getCardsPlayer().size() == 1 && canSingUnoPlayer){
+            System.out.println("PLAYER SAYS UNO");
+            threadSingUNOMachine.canSingUnoMachine = false;
+            machinePlayer.addCard(this.deck.takeCard());
+            printCardsMachine();
+        }
     }
 }
