@@ -37,8 +37,8 @@ public class GameUno implements IGameUno {
      */
     @Override
     public void startGame() {
-        for (int i = 0; i < 4; i++) {
-            if (i < 2) {
+        for (int i = 0; i < 10; i++) {
+            if (i < 8) {
                 humanPlayer.addCard(this.deck.takeCard());
             } else {
                 machinePlayer.addCard(this.deck.takeCard());

@@ -33,7 +33,7 @@ import static org.example.eiscuno.model.unoenum.EISCUnoEnum.*;
 public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback {
     @FXML
     public Button unoButton;
-
+    @FXML
     private Pane gamePane;
     @FXML
     private Pane centerPane;
@@ -52,8 +52,10 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
 
     private Player humanPlayer;
     public boolean canSingUnoPlayer;
+    public boolean canSingUnoMachineForPlayer;
+    public boolean canSingUnoMachineForMachine;
     private Player machinePlayer;
-    private boolean canSingUnoMachine;
+    public boolean canSingUnoMachine;
     private Deck deck;
     private Table table;
     private GameUno gameUno;
@@ -222,6 +224,9 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         cardsButton.setDisable(false);
         canSingUnoPlayer = true;
         System.out.println("- - - - - TURNO JUGADOR - - - - -");
+        if(machinePlayer.getCardsPlayer().size()==1){
+            nodeZoom(true,unoButton,1.3);
+        }
     }
 
     /**
@@ -247,6 +252,9 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         if (hasPlayerPlayed){
             disablePlayerCards();
             playWaveTranslateAnimation(gridPaneCardsMachine, Duration.seconds(0.5), 20);
+        }
+        if(humanPlayer.getCardsPlayer().size()==1){
+            nodeZoom(true,unoButton,1.3);
         }
     }
 
@@ -355,7 +363,7 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
      * @param node    The JavaFX node to apply the zoom animation to.
      * @param to      The target scale value for zooming (`1.0` represents the node's original size).
      */
-    private void nodeZoom(boolean doZoom, Node node,double to){
+    public void nodeZoom(boolean doZoom, Node node,double to){
         ScaleTransition translateIn = new ScaleTransition(Duration.seconds(0.2), node);
         translateIn.setToX(to);
         translateIn.setToY(to);
@@ -510,15 +518,6 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
                 });
     }
 
-    private void showAlert(String title, String content) {
-        Alert alert;
-        alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait().ifPresent(response -> System.exit(0));
-    }
-
     @Override
     public void restoreDeckIfNeeded() {
         List<Card> cardsOnTable = table.clearTable();
@@ -610,14 +609,16 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
      */
     @FXML
     void onHandleUno(ActionEvent event) {
+        nodeZoom(true,unoButton,1);
         if (humanPlayer.getCardsPlayer().size() == 1 && canSingUnoPlayer){
             System.out.println("EL JUGADOR CANTA UNO PARA SI MISMO");
-            threadSingUNOMachine.canSingUnoMachine = false;
-        } else if (machinePlayer.getCardsPlayer().size() == 1 && canSingUnoPlayer){
+            canSingUnoMachineForPlayer = false;
+        } else if (machinePlayer.getCardsPlayer().size() == 1 && canSingUnoPlayer) {
             System.out.println("EL JUGADOR CANTA UNO PARA LA MAQUINA, LA MAQUINA COME UNA CARTA");
-            threadSingUNOMachine.canSingUnoMachine = false;
+            canSingUnoMachineForMachine = false;
             machinePlayer.addCard(this.deck.takeCard());
             printCardsMachine();
+            setupGridPane();
         }
     }
 }
