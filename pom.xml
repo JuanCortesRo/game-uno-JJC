@@ -40,6 +40,13 @@
         </dependency>
     </dependencies>
 
+    <dependency>
+        <groupId>org.testfx</groupId>
+        <artifactId>testfx-junit5</artifactId>
+        <version>4.0.18</version>
+        <scope>test</scope>
+    </dependency>
+
     <build>
         <plugins>
             <plugin>
