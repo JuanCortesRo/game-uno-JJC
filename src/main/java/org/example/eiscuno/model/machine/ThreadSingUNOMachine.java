@@ -46,9 +46,10 @@ public class ThreadSingUNOMachine implements Runnable{
 
     private void hasOneCardTheHumanPlayer(){
         if(cardsPlayer.size() == 1 && this.canSingUnoMachine){
-            System.out.println("MACHINE SAYS UNO");
+            System.out.println("LA MAQUINA CANTA UNO AL JUGADOR, EL JUGADOR COME UNA CARTA");
             this.canSingUnoPlayer = false;
             this.humanPlayer.addCard(this.deck.takeCard());
+            callback.printCardsHumanPlayer();
         }
         else if (cardsPlayer.size() != 1 && !canSingUnoMachine){
             canSingUnoMachine = true;
@@ -57,7 +58,7 @@ public class ThreadSingUNOMachine implements Runnable{
 
     private void hasOneCardTheMachinePlayer(){
         if(cardsMachine.size() == 1 && canSingUnoMachine){
-            System.out.println("MACHINE SAYS UNO");
+            System.out.println("LA MAQUINA CANTA UNO PARA SI MISMA");
             callback.canSingUnoPlayer = false;
         }
         else if (cardsMachine.size() != 1 && !canSingUnoMachine){
