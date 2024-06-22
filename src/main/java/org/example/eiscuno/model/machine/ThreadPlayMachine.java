@@ -5,6 +5,7 @@ import javafx.animation.ScaleTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -220,22 +221,26 @@ public class ThreadPlayMachine extends Thread {
 
         String finalCardColor = cardColor;
         circleZoom.setOnFinished(event -> {
-            switch (finalCardColor) {
-                case "GREEN":
-                    gamePane.setStyle("-fx-background-color: #54a954");
-                    break;
-                case "BLUE":
-                    gamePane.setStyle("-fx-background-color: #5252fe");
-                    break;
-                case "RED":
-                    gamePane.setStyle("-fx-background-color: #ff3737");
-                    break;
-                case "YELLOW":
-                    gamePane.setStyle("-fx-background-color: #ffbd39");
-                    break;
-                case "BLACK":
-                    gamePane.setStyle("-fx-background-color: BLACK");
-                    break;
+            if (gamePane != null){
+                switch (finalCardColor) {
+                    case "GREEN":
+                        gamePane.setStyle("-fx-background-color: #54a954");
+                        break;
+                    case "BLUE":
+                        gamePane.setStyle("-fx-background-color: #5252fe");
+                        break;
+                    case "RED":
+                        gamePane.setStyle("-fx-background-color: #ff3737");
+                        break;
+                    case "YELLOW":
+                        gamePane.setStyle("-fx-background-color: #ffbd39");
+                        break;
+                    case "BLACK":
+                        gamePane.setStyle("-fx-background-color: BLACK");
+                        break;
+                }
+            } else {
+                System.out.println("gamepane is null");
             }
         });
     }

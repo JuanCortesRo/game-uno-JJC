@@ -519,28 +519,6 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
         alert.showAndWait().ifPresent(response -> System.exit(0));
     }
 
-//    @Override
-//    public void checkIfAnyPlayerWins() {
-//        System.out.println(machinePlayer.getCardsPlayer().size());
-//        if (humanPlayer.getCardsPlayer().size() == 0) {
-//            System.out.println("___________________________________________\n            ¡EL JUGADOR GANÓ! \n___________________________________________");
-////            Image winImage = new Image(String.valueOf(getClass().getResource(WIN_.getFilePath())));
-////            ImageView winImageView = new ImageView(winImage);
-////            nodeZoom(true,winImageView,1.5);
-////            gamePane.getChildren().add(winImageView);
-//            disablePlayerCards();
-//            //threadPlayMachine.changeBackgroundColor("LIMEGREEN");
-//        } else if (machinePlayer.getCardsPlayer().size() == 0) {
-//            System.out.println("___________________________________________\n            ¡LA MAQUINA GANÓ! \n___________________________________________");
-////            Image looseImage = new Image(String.valueOf(getClass().getResource(LOOSE_.getFilePath())));
-////            ImageView looseImageView = new ImageView(looseImage);
-////            nodeZoom(true,looseImageView,1.5);
-////            gamePane.getChildren().add(looseImageView);
-//            disablePlayerCards();
-//            //threadPlayMachine.changeBackgroundColor("RED");
-//        }
-//    }
-
     @Override
     public void restoreDeckIfNeeded() {
         List<Card> cardsOnTable = table.clearTable();
@@ -633,12 +611,10 @@ public class GameUnoController implements ThreadPlayMachine.MachinePlayCallback 
     @FXML
     void onHandleUno(ActionEvent event) {
         if (humanPlayer.getCardsPlayer().size() == 1 && canSingUnoPlayer){
-            System.out.println("PLAYER SAYS UNO");
+            System.out.println("EL JUGADOR CANTA UNO PARA SI MISMO");
             threadSingUNOMachine.canSingUnoMachine = false;
-        }
-
-        if (machinePlayer.getCardsPlayer().size() == 1 && canSingUnoPlayer){
-            System.out.println("PLAYER SAYS UNO");
+        } else if (machinePlayer.getCardsPlayer().size() == 1 && canSingUnoPlayer){
+            System.out.println("EL JUGADOR CANTA UNO PARA LA MAQUINA, LA MAQUINA COME UNA CARTA");
             threadSingUNOMachine.canSingUnoMachine = false;
             machinePlayer.addCard(this.deck.takeCard());
             printCardsMachine();
